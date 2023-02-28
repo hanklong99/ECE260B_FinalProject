@@ -3,7 +3,7 @@
 Report : area
 Design : fullchip
 Version: Q-2019.12-SP5-3
-Date   : Mon Feb 27 18:16:59 2023
+Date   : Mon Feb 27 18:36:36 2023
 ****************************************
 
 Information: Updating design information... (UID-85)
@@ -12,22 +12,22 @@ Library(s) Used:
 
     tcbn65gpluswc (File: /home/linux/ieng6/ee260bwi23/public/PDKdata/db/tcbn65gpluswc.db)
 
-Number of ports:                        19996
-Number of nets:                         67228
-Number of cells:                        43244
-Number of combinational cells:          31222
-Number of sequential cells:             11848
+Number of ports:                        20012
+Number of nets:                         70753
+Number of cells:                        45945
+Number of combinational cells:          31859
+Number of sequential cells:             13896
 Number of macros/black boxes:               0
-Number of buf/inv:                       2957
-Number of references:                       1
+Number of buf/inv:                       6821
+Number of references:                       2
 
-Combinational area:             120112.199801
-Buf/Inv area:                     4649.040135
-Noncombinational area:          109624.677611
+Combinational area:             107308.080214
+Buf/Inv area:                     7745.040304
+Noncombinational area:          121375.436956
 Macro/Black Box area:                0.000000
 Net Interconnect area:      undefined  (Wire load has zero net area)
 
-Total cell area:                229736.877412
+Total cell area:                228683.517170
 Total area:                 undefined
 1
  
@@ -35,7 +35,7 @@ Total area:                 undefined
 Report : reference
 Design : fullchip
 Version: Q-2019.12-SP5-3
-Date   : Mon Feb 27 18:17:02 2023
+Date   : Mon Feb 27 18:36:38 2023
 ****************************************
 
 Attributes:
@@ -51,8 +51,10 @@ Attributes:
 
 Reference          Library       Unit Area   Count    Total Area   Attributes
 -----------------------------------------------------------------------------
-core_col8_bw8_bw_psum20_pr16  229736.877412
-                                                 1  229736.877412 h, n
+INVD1              tcbn65gpluswc
+                                  1.080000       4      4.320000  
+core_col8_bw8_bw_psum20_pr16  228679.197170
+                                                 1  228679.197170 h, n
 -----------------------------------------------------------------------------
-Total 1 references                                  229736.877412
+Total 2 references                                  228683.517170
 1
