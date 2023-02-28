@@ -47,6 +47,19 @@ assign pmem_wr = inst[0];
 
 assign mac_in  = inst[6] ? kmem_out : qmem_out;
 assign pmem_in = fifo_out;
+//edited: connect pmem to output port
+assign out = pmem_out;
+always @ (posedge clk) begin
+  if (reset) begin
+        sum_out <= 0;
+  end
+  else begin
+        sum_out <= [bw_psum*1-1:0] out + [bw_psum*2-1:bw_psum*1] out + [bw_psum*3-1:bw_psum*2] out + [bw_psum*4-1:bw_psum*3] out + [bw_psum*5-1:bw_psum*4] out + [bw_psum*7-1:bw_psum*6] out + [bw_psum*8-1:bw_psum*7] out;
+  end
+end
+
+
+
 
 mac_array #(.bw(bw), .bw_psum(bw_psum), .col(col), .pr(pr)) mac_array_instance (
         .in(mac_in), 
