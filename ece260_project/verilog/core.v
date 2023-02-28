@@ -54,7 +54,7 @@ always @ (posedge clk) begin
         sum_out <= 0;
   end
   else begin
-        sum_out <= [bw_psum*1-1+:0] pmem_out + [bw_psum*2-1+:bw_psum*1] pmem_out + [bw_psum*3-1+:bw_psum*2] pmem_out + [bw_psum*4-1+:bw_psum*3] pmem_out + [bw_psum*5-1+:bw_psum*4] pmem_out + [bw_psum*7-1+:bw_psum*6] pmem_out + [bw_psum*8-1+:bw_psum*7] pmem_out;
+        sum_out <=  pmem_out[bw_psum*1-1:0] + pmem_out[bw_psum*2-1:bw_psum*1] + pmem_out[bw_psum*3-1:bw_psum*2] + pmem_out[bw_psum*4-1:bw_psum*3] + pmem_out[bw_psum*5-1:bw_psum*4] + pmem_out[bw_psum*7-1:bw_psum*6] + pmem_out[bw_psum*8-1:bw_psum*7];
   end
 end
 
