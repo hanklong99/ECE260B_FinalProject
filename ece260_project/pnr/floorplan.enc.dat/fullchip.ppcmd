@@ -13,7 +13,7 @@
 # END_PPCMD 1 
 
 # PPCMD 2 
-# addStripe -nets {VDD VSS} -layer M4 -direction vertical -width 2 -spacing 6 -number_of_sets 5 -start_from left -start 80 -stop 180
+# addStripe -nets {VDD VSS} -layer M4 -direction vertical -width 2 -spacing 6 -number_of_sets 32 -start_from left -start 20 -stop 680
 # 3 
 # 2 
 # 1 
@@ -25,8 +25,8 @@
 # 12000 12000 1377200 1372000 0 
 # END_BOX_LIST 
 # NET_INFO_LIST 
-# VSS 4000 4 0 176000 362000 45000 0 0 
-# VDD 4000 4 0 160000 362000 45000 0 0 
+# VSS 4000 4 0 56000 1362000 41930 0 0 
+# VDD 4000 4 0 40000 1362000 41930 0 0 
 # END_NET_INFO_LIST 
 # END_PPCMD 2 
 

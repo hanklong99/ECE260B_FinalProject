@@ -10,5 +10,5 @@ addRing -spacing {top 2 bottom 2 left 2 right 2} -width {top 3 bottom 3 left 3 r
 
 setAddStripeMode -break_At {block_ring} 
 
-addStripe -nets {VDD VSS} -layer M4 -direction vertical -width 2 -spacing 6 -number_of_sets 5 -start_from left -start 80 -stop 180
+addStripe -nets {VDD VSS} -layer M4 -direction vertical -width 2 -spacing 6 -number_of_sets 32 -start_from left -start 20 -stop 680
 sroute

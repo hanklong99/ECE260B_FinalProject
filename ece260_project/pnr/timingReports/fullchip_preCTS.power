@@ -2,7 +2,7 @@
 *	Innovus 19.17-s077_1 (64bit) 12/01/2020 11:09 (Linux 2.6.32-431.11.2.el6.x86_64)
 *	
 *
-* 	Date & Time:	2023-Feb-27 19:27:50 (2023-Feb-28 03:27:50 GMT)
+* 	Date & Time:	2023-Feb-27 20:17:01 (2023-Feb-28 04:17:01 GMT)
 *
 *----------------------------------------------------------------------------------------
 *
@@ -43,44 +43,44 @@
 
 Total Power 
 -----------------------------------------------------------------------------------------
-Total Internal Power:      137.63078691 	   79.9071%
-Total Switching Power:      32.89634635 	   19.0993%
-Total Leakage Power:         1.71143959 	    0.9936%
-Total Power:               172.23857236 
+Total Internal Power:      137.74218740 	   79.2618%
+Total Switching Power:      34.32402620 	   19.7513%
+Total Leakage Power:         1.71504774 	    0.9869%
+Total Power:               173.78126088 
 -----------------------------------------------------------------------------------------
 
 
 Group                           Internal   Switching     Leakage       Total  Percentage 
                                 Power      Power         Power         Power  (%)        
 -----------------------------------------------------------------------------------------
-Sequential                         103.3       5.718      0.7943       109.8       63.73 
+Sequential                         103.3       5.544       0.795       109.6       63.06 
 Macro                                  0           0           0           0           0 
-IO                                     0           0    6.84e-06    6.84e-06   3.971e-06 
-Combinational                      34.38       27.18      0.9172       62.47       36.27 
+IO                                     0           0    6.84e-06    6.84e-06   3.936e-06 
+Combinational                      34.49       28.78        0.92       64.19       36.94 
 Clock (Combinational)                  0           0           0           0           0 
 Clock (Sequential)                     0           0           0           0           0 
 -----------------------------------------------------------------------------------------
-Total                              137.6        32.9       1.711       172.2         100 
+Total                              137.7       34.32       1.715       173.8         100 
 -----------------------------------------------------------------------------------------
 
 
 Rail                  Voltage   Internal   Switching     Leakage       Total  Percentage 
                                 Power      Power         Power         Power  (%)        
 -----------------------------------------------------------------------------------------
-VDD                       0.9      137.6        32.9       1.711       172.2         100 
+VDD                       0.9      137.7       34.32       1.715       173.8         100 
 
 
 -----------------------------------------------------------------------------------------
 *	Power Distribution Summary: 
-*                Highest Average Power: core_instance/ofifo_inst/col_idx_6__fifo_instance/FE_OFC42_array_out_129 (CKBD2):          0.05837 
-*                Highest Leakage Power:         core_instance/U73 (FA1D4):        0.0002618 
-*          Total Cap:      2.80388e-10 F
-*          Total instances in design: 46190
+*                Highest Average Power: core_instance/ofifo_inst/col_idx_1__fifo_instance/FE_OFC122_array_out_35 (CKBD2):          0.06588 
+*                Highest Leakage Power:         core_instance/U68 (FA1D4):        0.0002617 
+*          Total Cap:      2.84426e-10 F
+*          Total instances in design: 46255
 *          Total instances in design with no power:     0
 *          Total instances in design with no activity:     0
 *          Total Fillers and Decap:     0
 -----------------------------------------------------------------------------------------
 
-Total leakage power = 1.71144 mW
+Total leakage power = 1.71505 mW
 Cell usage statistics:  
-Library tcbn65gpluswc , 46190 cells ( 100.000000%) , 1.71144 mW ( 100.000000%  ) 
+Library tcbn65gpluswc , 46255 cells ( 100.000000%) , 1.71505 mW ( 100.000000%  ) 
