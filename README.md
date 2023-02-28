@@ -35,11 +35,16 @@ source placement.tcl
 source pinPlacement.tcl
 source clock.tcl
 source route.tcl
-source reportDesign.tcl
-source outputGen.tcl
 
 verifyConnectivity
 verifyGeometry
+optDesign –postRoute –drv
+optDesign –postRoute -inc
 checkPinPlacement
+
+source reportDesign.tcl
+source outputGen.tcl
+
+
 
 ```
