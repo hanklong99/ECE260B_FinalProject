@@ -7,7 +7,7 @@ parameter bw = 8;
 parameter bw_psum = 2*bw+4;
 parameter pr = 16;
 
-output [bw_psum+3:0] sum_out;
+output reg [bw_psum+3:0] sum_out;
 output [bw_psum*col-1:0] out;
 wire   [bw_psum*col-1:0] pmem_out;
 input  [pr*bw-1:0] mem_in;
