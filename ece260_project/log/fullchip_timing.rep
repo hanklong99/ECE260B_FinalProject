@@ -1,0 +1,19 @@
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -nets
+        -max_paths 100
+        -transition_time
+        -capacitance
+Design : fullchip
+Version: Q-2019.12-SP5-3
+Date   : Mon Feb 27 17:58:09 2023
+****************************************
+
+Operating Conditions: WCCOM   Library: tcbn65gpluswc
+Wire Load Model Mode: segmented
+No paths.
+
+1
