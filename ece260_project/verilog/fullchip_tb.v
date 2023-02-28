@@ -360,7 +360,26 @@ $display("##### move ofifo to pmem #####");
 
 ///////////////////////////////////////////
 
+////////////// output psum mem to output ports ///////////////////
 
+$display("##### move ofifo to pmem #####");
+
+  for (q=0; q<total_cycle; q=q+1) begin
+    #0.5 clk = 1'b0;  
+    pmem_rd = 1; 
+
+    if (q>0) begin
+       pmem_add = pmem_add + 1;
+    end
+
+    #0.5 clk = 1'b1;  
+  end
+
+  #0.5 clk = 1'b0;  
+  pmem_wr = 0; pmem_add = 0; ofifo_rd = 0;
+  #0.5 clk = 1'b1;  
+
+///////////////////////////////////////////
 
 
   #10 $finish;
