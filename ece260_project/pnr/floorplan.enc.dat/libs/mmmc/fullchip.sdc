@@ -1,0 +1,1 @@
+/home/linux/ieng6/ee260bwi23/helong/final_project/ece260_project/pnr/constraints/fullchip.sdc
