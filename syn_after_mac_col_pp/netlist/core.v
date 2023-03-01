@@ -117,8 +117,8 @@ sram_160b_w16 #(.sram_bit(col*bw_psum)) psum_mem_instance (
   end
 
   always @(posedge clk) begin
-      if(pmem_wr)
-         $display("PSUM mem out from sram  %x ", pmem_in); 
+	  if(pmem_rd)
+		  $display("PSUM mem out from sram  %x ", pmem_out); 
   end
 
 
