@@ -44,7 +44,13 @@ checkPinPlacement
 
 source reportDesign.tcl
 source outputGen.tcl
+```
+### 4. Load Final PnR Design
 
+```
+cd pnr
+innovus
+source loadDesignTech.tcl
 
-
+source route.enc
 ```
