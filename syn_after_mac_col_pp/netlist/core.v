@@ -75,7 +75,7 @@ ofifo #(.bw(bw_psum), .col(col))  ofifo_inst (
         .clk(clk),
         .in(array_out),
         .wr(fifo_wr),      //8bit fifo_wr defined in mac_array and mac_col
-        .rd(ofifo_rd),     //1bit fifo_wr defined in mac_col (2cyc late than i_inst
+	.rd(ofifo_rd),     //1bit fifo_wr defined in mac_col (3cyc late than i_inst
         .o_valid(fifo_valid),   //1bit fifo_wr means col by col mac(20bit) is done and psum can b output
         .out(fifo_out)          //8bit fifo_wr means col(Q) by array(K) is done(160bit) and out can b output                                          to ofifo, the bit width of ofifo is 8*20=160
 );                              //only 8 col by array result, so fifo only need 8 depth
