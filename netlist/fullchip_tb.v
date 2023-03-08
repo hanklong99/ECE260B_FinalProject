@@ -76,7 +76,7 @@ assign inst[1] = pmem_rd;
 assign inst[0] = pmem_wr;
 //core1
 reg reset1 = 1;
-reg clk1 =0;
+reg clk1 =1;
 reg [pr*bw*2-1:0] mem_in1;     
 reg norm_rd1 = 0;
 reg norm_wr1 = 0;
@@ -218,6 +218,7 @@ $display("##### V data txt reading #####");
 
 
   vn_file = $fopen("vdata.txt", "r");
+  vn_file1 = $fopen("vdata.txt", "r");
 
   //// To get rid of first 4 data in data file ////
 //  vn_scan_file = $fscanf(vn_file, "%s\n", captured_data);
@@ -230,7 +231,10 @@ $display("##### V data txt reading #####");
     for (j=0; j<pr; j=j+1) begin
           vn_scan_file = $fscanf(vn_file, "%d\n", captured_data);
           V[q][j] = captured_data;
-//          $display("%d\n", V[q][j]);
+          vn_scan_file1 = $fscanf(vn_file1, "%d\n", captured_data1);
+          V1[q][j] = captured_data1;
+          $display("%d\n", V[q][j]);
+          $display("%d\n", V1[q][j]);
     end
   end
 /////////////////////////////////
@@ -239,8 +243,8 @@ $display("##### V data txt reading #####");
 
 
   for (q=0; q<2; q=q+1) begin
-    #0.5 clk = 1'b0;   
-    #0.5 clk = 1'b1;   
+    #0.5 clk = 1'b0;   clk1 = 1'b1; 
+    #0.5 clk = 1'b1;   clk1 = 1'b0; 
   end
 
 
@@ -251,12 +255,15 @@ $display("##### V data txt reading #####");
 $display("##### N data txt reading #####");
 
   for (q=0; q<10; q=q+1) begin
-    #0.5 clk = 1'b0;   
-    #0.5 clk = 1'b1;   
+    #0.5 clk = 1'b0;   clk1 = 1'b1; 
+    if(q==9) reset1 = 0;
+    #0.5 clk = 1'b1;   clk1 = 1'b0; 
   end
   reset = 0;
+  
 
   vn_file = $fopen("ndata.txt", "r");
+  vn_file1 = $fopen("ndata.txt", "r");
 
   //// To get rid of first 4 data in data file ////
 //  vn_scan_file = $fscanf(vn_file, "%s\n", captured_data);
@@ -268,9 +275,16 @@ $display("##### N data txt reading #####");
     for (j=0; j<pr; j=j+1) begin
           vn_scan_file = $fscanf(vn_file, "%d\n", captured_data);
           data_bin = dec2bin(captured_data);
-	  N_8b[q][j] = captured_data;     //for 4col use
-	  N[q][j] = data_bin[7:4];     //for 8col use
+          N_8b[q][j] = captured_data;     //for 4col use
+          N[q][j] = data_bin[7:4];     //for 8col use
           N[q+1][j] = data_bin[3:0];   //for 8col use
+
+
+          vn_scan_file1 = $fscanf(vn_file1, "%d\n", captured_data1);
+          data_bin1 = dec2bin(captured_data1);
+          N_8b1[q][j] = captured_data1;     //for 4col use
+          N1[q][j] = data_bin1[7:4];     //for 8col use
+          N1[q+1][j] = data_bin1[3:0];   //for 8col use
 //	  $display("##### %d\n", captured_data);
 //          $display("##### %d\n", N[q][j]);
 //	  $display("##### %d\n", N[q+1][j]);
@@ -294,6 +308,7 @@ $display("##### Estimated 4bit multiplication result #####");
   for (t=0; t<total_cycle; t=t+1) begin
      for (q=0; q<col; q=q+1) begin
        result[t][q] = 0;
+       result1[t][q] = 0;
      end
   end
 
@@ -301,17 +316,22 @@ $display("##### Estimated 4bit multiplication result #####");
      for (q=0; q<col; q=q+1) begin
          for (k=0; k<pr; k=k+1) begin
             result[t][q] = result[t][q] + V[t][k] * N[q][k];
+            result1[t][q] = result1[t][q] + V1[t][k] * N1[q][k];
 	    //$display("%d",k);
          end
 
          temp5b = result[t][q];
          temp16b = {temp16b[83:0], temp5b};    
+
+         temp5b1 = result1[t][q];
+         temp16b1 = {temp16b1[83:0], temp5b1}; 
      end
 
 //     $display("%d %d %d %d %d %d %d %d", result[t][0], result[t][1], result[t][2], result[t][3], result[t][4], result[t][5], result[t][6], result[t][7]);
 //     $display("%d %d %d %d %d %d %d %d", temp16b[95:84], temp16b[83:72], temp16b[71:60], temp16b[59:48], temp16b[47:36], temp16b[35:24], temp16b[23:12], temp16b[11:0]);
 //     $display("%h %h %h %h %h %h %h %h", temp16b[95:84], temp16b[83:72], temp16b[71:60], temp16b[59:48], temp16b[47:36], temp16b[35:24], temp16b[23:12], temp16b[11:0]);
      $display("prd @cycle%2d: %h", t, temp16b);    //%40h
+     $display("prd @cycle%2d: %h", t, temp16b1);    //%40h
 
   end
 
@@ -328,7 +348,7 @@ $display("##### Vmem writing  #####");
 
   for (q=0; q<total_cycle; q=q+1) begin
 
-    #0.5 clk = 1'b0;  
+    #0.5 clk = 1'b0;  clk1 = 1'b1;
     vmem_wr = 1;  if (q>0) vnmem_add = vnmem_add + 1; 
     
     mem_in[2*bw-1:0*bw] = V[q][0];    //7:0
@@ -348,15 +368,28 @@ $display("##### Vmem writing  #####");
     mem_in[15*bw-1:14*bw] = Q[q][14];
     mem_in[16*bw-1:15*bw] = Q[q][15];
 */
-    #0.5 clk = 1'b1;  
+    #0.5 clk = 1'b1;  clk1 = 1'b0;
+
+    vmem_wr1 = 1;  if (q>0) vnmem_add1 = vnmem_add1 + 1; 
+    
+    mem_in1[2*bw-1:0*bw] = V1[q][0];    //7:0
+    mem_in1[4*bw-1:2*bw] = V1[q][1];    //15:8
+    mem_in1[6*bw-1:4*bw] = V1[q][2];
+    mem_in1[8*bw-1:6*bw] = V1[q][3];
+    mem_in1[10*bw-1:8*bw] = V1[q][4];
+    mem_in1[12*bw-1:10*bw] = V1[q][5];
+    mem_in1[14*bw-1:12*bw] = V1[q][6];
+    mem_in1[16*bw-1:14*bw] = V1[q][7];  //2*4*8-1:
 
   end
 
 
-  #0.5 clk = 1'b0;  
+  #0.5 clk = 1'b0;  clk1 = 1'b1;
   vmem_wr = 0; 
   vnmem_add = 0;
-  #0.5 clk = 1'b1;  
+  #0.5 clk = 1'b1;  clk1 = 1'b0;
+  vmem_wr1 = 0; 
+  vnmem_add1 = 0;
 ///////////////////////////////////////////
 
 
@@ -369,7 +402,7 @@ $display("##### Nmem writing #####");
 
   for (q=0; q<col; q=q+1) begin
 
-    #0.5 clk = 1'b0;  
+    #0.5 clk = 1'b0;  clk1 = 1'b1;
     nmem_wr = 1; if (q>0) vnmem_add = vnmem_add + 1; 
     
     mem_in[2*bw-1:0*bw] = N[q][0];    //7:0
@@ -389,21 +422,33 @@ $display("##### Nmem writing #####");
     mem_in[15*bw-1:14*bw] = K[q][14];
     mem_in[16*bw-1:15*bw] = K[q][15];
 */
-    #0.5 clk = 1'b1;  
+    #0.5 clk = 1'b1;  clk1 = 1'b0;
+    nmem_wr1 = 1; if (q>0) vnmem_add1 = vnmem_add1 + 1; 
+    
+    mem_in1[2*bw-1:0*bw] = N1[q][0];    //7:0
+    mem_in1[4*bw-1:2*bw] = N1[q][1];    //15:8
+    mem_in1[6*bw-1:4*bw] = N1[q][2];
+    mem_in1[8*bw-1:6*bw] = N1[q][3];
+    mem_in1[10*bw-1:8*bw] = N1[q][4];
+    mem_in1[12*bw-1:10*bw] = N1[q][5];
+    mem_in1[14*bw-1:12*bw] = N1[q][6];
+    mem_in1[16*bw-1:14*bw] = N1[q][7];  //2*4*8-1:
 
   end
 
-  #0.5 clk = 1'b0;  
+  #0.5 clk = 1'b0;  clk1 = 1'b1;
   nmem_wr = 0;  
   vnmem_add = 0;
-  #0.5 clk = 1'b1;  
+  #0.5 clk = 1'b1;  clk1 = 1'b0;
+  nmem_wr1 = 0;  
+  vnmem_add1 = 0;
 ///////////////////////////////////////////
 
 
 
   for (q=0; q<2; q=q+1) begin
-    #0.5 clk = 1'b0;  
-    #0.5 clk = 1'b1;   
+    #0.5 clk = 1'b0;  clk1 = 1'b1;
+    #0.5 clk = 1'b1;  clk1 = 1'b0;
   end
 
 
@@ -413,29 +458,37 @@ $display("##### Nmem writing #####");
 $display("##### N data loading to processor #####");
 
   for (q=0; q<col+1; q=q+1) begin
-    #0.5 clk = 1'b0;  
+    #0.5 clk = 1'b0;  clk1 = 1'b1;
     load = 1; 
     if (q==1) nmem_rd = 1;
     if (q>1) begin
        vnmem_add = vnmem_add + 1;
     end
 
-    #0.5 clk = 1'b1;  
+    #0.5 clk = 1'b1;  clk1 = 1'b0;
+    load1 = 1; 
+    if (q==1) nmem_rd1 = 1;
+    if (q>1) begin
+       vnmem_add1 = vnmem_add1 + 1;
+    end
+
   end
 
-  #0.5 clk = 1'b0;  
+  #0.5 clk = 1'b0;  clk1 = 1'b1;
   nmem_rd = 0; vnmem_add = 0;
-  #0.5 clk = 1'b1;  
+  #0.5 clk = 1'b1;  clk1 = 1'b0;
+  nmem_rd1 = 0; vnmem_add1 = 0;
 
-  #0.5 clk = 1'b0;  
+  #0.5 clk = 1'b0;  clk1 = 1'b1;
   load = 0; 
-  #0.5 clk = 1'b1;  
+  #0.5 clk = 1'b1;  clk1 = 1'b0;  
+  load1 = 1; 
 
 ///////////////////////////////////////////
 
  for (q=0; q<10; q=q+1) begin
-    #0.5 clk = 1'b0;   
-    #0.5 clk = 1'b1;   
+    #0.5 clk = 1'b0;   clk1 = 1'b1;
+    #0.5 clk = 1'b1;   clk1 = 1'b0;
  end
 
 
@@ -446,7 +499,7 @@ $display("##### N data loading to processor #####");
 $display("##### execute #####");
 
   for (q=0; q<total_cycle; q=q+1) begin
-    #0.5 clk = 1'b0;  
+    #0.5 clk = 1'b0;  clk1 = 1'b1;
     execute = 1; 
     vmem_rd = 1;
 
@@ -454,19 +507,27 @@ $display("##### execute #####");
        vnmem_add = vnmem_add + 1;
     end
 
-    #0.5 clk = 1'b1;  
+    #0.5 clk = 1'b1;  clk1 = 1'b0;
+
+    execute1 = 1; 
+    vmem_rd1 = 1;
+
+    if (q>0) begin
+       vnmem_add1 = vnmem_add1 + 1;
+    end
   end
 
-  #0.5 clk = 1'b0;  
+  #0.5 clk = 1'b0;  clk1 = 1'b1;
   vmem_rd = 0; vnmem_add = 0; execute = 0;
-  #0.5 clk = 1'b1;  
+  #0.5 clk = 1'b1;  clk1 = 1'b0;
+  vmem_rd1 = 0; vnmem_add1 = 0; execute1 = 0;
 
 
 ///////////////////////////////////////////
 
  for (q=0; q<10; q=q+1) begin
-    #0.5 clk = 1'b0;   
-    #0.5 clk = 1'b1;   
+    #0.5 clk = 1'b0;   clk1 = 1'b1;
+    #0.5 clk = 1'b1;   clk1 = 1'b0;
  end
 
 
@@ -477,7 +538,7 @@ $display("##### execute #####");
 $display("##### move ofifo to pmem #####");
 
   for (q=0; q<total_cycle; q=q+1) begin
-    #0.5 clk = 1'b0;  
+    #0.5 clk = 1'b0;  clk1 = 1'b1;
     ofifo_rd = 1; 
     pmem_wr = 1; 
 
@@ -485,12 +546,19 @@ $display("##### move ofifo to pmem #####");
        pmem_add = pmem_add + 1;
     end
 
-    #0.5 clk = 1'b1;  
+    #0.5 clk = 1'b1;  clk1 = 1'b0;
+    ofifo_rd1 = 1; 
+    pmem_wr1 = 1; 
+
+    if (q>0) begin
+       pmem_add1 = pmem_add1 + 1;
+    end
   end
 
-  #0.5 clk = 1'b0;  
+  #0.5 clk = 1'b0;  clk1 = 1'b1;
   pmem_wr = 0; pmem_add = 0; ofifo_rd = 0;
-  #0.5 clk = 1'b1;  
+  #0.5 clk = 1'b1;  clk1 = 1'b0;
+  pmem_wr1 = 0; pmem_add1 = 0; ofifo_rd1 = 0;
 
 ///////////////////////////////////////////
 
@@ -559,6 +627,7 @@ $display("##### Estimated 8bit multiplication result #####");
   for (t=0; t<total_cycle; t=t+1) begin
      for (q=0; q<col; q=q+1) begin
        result[t][q] = 0;
+       result1[t][q] = 0;
      end
   end
 
@@ -566,15 +635,20 @@ $display("##### Estimated 8bit multiplication result #####");
      for (q=0; q<col; q=q+2) begin
          for (k=0; k<pr; k=k+1) begin
             result[t][q] = result[t][q] + V[t][k] * N_8b[q][k];
+            result1[t][q] = result1[t][q] + V1[t][k] * N_8b1[q][k];
 //	    $display("%d",result[t][q]);
          end
 
          psum_result = result[t][q];
          cycle_result = {cycle_result[47:0], psum_result};
+
+         psum_result1 = result1[t][q];
+         cycle_result1 = {cycle_result1[47:0], psum_result1};
      end
 
 //     $display("%d %d %d %d %d %d %d %d", result[t][0], result[t][1], result[t][2], result[t][3], result[t][4], result[t][5], result[t][6], result[t][7]);
      $display("prd @cycle%2d: %h", t, cycle_result); 
+     $display("prd @cycle%2d: %h", t, cycle_result1); 
 
   end
 
@@ -587,486 +661,62 @@ $display("##### Estimated 8bit multiplication result #####");
 
 $display("##### move pmem_out from sram, recon, norm, get sum from another core write to norm sram #####");
   col_c = 1;pmem_rd = 1;
-  #0.5 clk = 1'b0;
-  #0.5 clk = 1'b1;
-  #0.5 clk = 1'b0;
+  #0.5 clk = 1'b0; clk1 = 1'b1;
+  col_c1 = 1;pmem_rd1 = 1;
+  #0.5 clk = 1'b1; clk1 = 1'b0;
+  #0.5 clk = 1'b0; clk1 = 1'b1;
   pmem_add = pmem_add +1;
-  #0.5 clk = 1'b1;
-  #0.5 clk = 1'b0;
+  #0.5 clk = 1'b1; clk1 = 1'b0;
+  pmem_add1 = pmem_add1 +1;
+  #0.5 clk = 1'b0; clk1 = 1'b1;
   for (q=0; q<total_cycle; q=q+1) begin
     pmem_add = pmem_add + 1;	  
+    pmem_add1 = pmem_add1 + 1;	  
     if (q>4) begin
        norm_wr = 1;
+       norm_wr1 = 1;
     end
     acc = 1; div = 1;
-    #0.5 clk = 1'b1;
-    #0.5 clk = 1'b0;
+    #0.5 clk = 1'b1; clk1 = 1'b0;
+    acc1 = 1; div1 = 1;
+    #0.5 clk = 1'b0; clk1 = 1'b1;
     if (q>5) begin
        norm_add = norm_add + 1;
+       norm_add1 = norm_add1 + 1;
     end
   end     
-  #0.5 clk = 1'b1;
-  #0.5 clk = 1'b0;
+  #0.5 clk = 1'b1; clk1 = 1'b0;
+  #0.5 clk = 1'b0; clk1 = 1'b1;
   pmem_rd = 0; pmem_add = 0; norm_add = norm_add + 1;
-  #0.5 clk = 1'b1;
-  #0.5 clk = 1'b0;
+  #0.5 clk = 1'b1; clk1 = 1'b0;
+  pmem_rd1 = 0; pmem_add1 = 0; norm_add1 = norm_add1 + 1;
+  #0.5 clk = 1'b0; clk1 = 1'b1;
   acc =0; norm_add =norm_add + 1;
-  #0.5 clk = 1'b1;  
+  #0.5 clk = 1'b1; clk1 = 1'b0;
+  acc1 =0; norm_add1 =norm_add1 + 1;
   col_c =0;
-  #0.5 clk = 1'b0; 
+  #0.5 clk = 1'b0; clk1 = 1'b1;
+  col_c1 =0;
   norm_add =norm_add + 1;
-  #0.5 clk = 1'b1; 
-  #0.5 clk = 1'b0;
+  #0.5 clk = 1'b1; clk1 = 1'b0;
+  norm_add1 =norm_add1 + 1;
+  #0.5 clk = 1'b0; clk1 = 1'b1;
   norm_add =norm_add + 1;
-  #0.5 clk = 1'b1; 
+  #0.5 clk = 1'b1; clk1 = 1'b0;
+  norm_add1 =norm_add1 + 1;
   div = 0;
-  #0.5 clk = 1'b0;
+  #0.5 clk = 1'b0; clk1 = 1'b1;
+  div1 = 0;
   norm_add =norm_add + 1;
-  #0.5 clk = 1'b1; 
+  #0.5 clk = 1'b1; div = 0;
+  norm_add1 =norm_add1 + 1;
   norm_wr = 0; norm_add =0;
+  #0.5 clk = 1'b0; clk1 = 1'b1;
+  norm_wr1 = 0; norm_add1 =0;
 
 
 //  #10 $finish;
 end
-
- 		      ////    core0 end      /////
-
-                      ////    core1 start     /////
-
-initial begin 
-
-  $dumpfile("fullchip_tb.vcd");
-  $dumpvars(0,fullchip_tb);
-
-
-
-
-/////////////////////// 4bit 8col start (col_c=0) (core1) //////////////////////
-
-
-
-///// V data txt reading /////
-
-$display("##### V data txt reading #####");
-
-
-  vn_file = $fopen("vdata.txt", "r");
-
-  //// To get rid of first 4 data in data file ////
-//  vn_scan_file = $fscanf(vn_file, "%s\n", captured_data);
-//  vn_scan_file = $fscanf(vn_file, "%s\n", captured_data);
-//  vn_scan_file = $fscanf(vn_file, "%s\n", captured_data);
-//  vn_scan_file = $fscanf(vn_file, "%s\n", captured_data);
-
-
-  for (q=0; q<total_cycle; q=q+1) begin
-    for (j=0; j<pr; j=j+1) begin
-          vn_scan_file = $fscanf(vn_file, "%d\n", captured_data);
-          V[q][j] = captured_data;
-//          $display("%d\n", V[q][j]);
-    end
-  end
-/////////////////////////////////
-
-
-
-  #0.1
-  for (q=0; q<2; q=q+1) begin
-    #0.5 clk1 = 1'b0;   
-    #0.5 clk1 = 1'b1;   
-  end
-
-
-
-
-///// N data txt reading /////  N need to be divided in to 2 4bits binary number
-
-$display("##### N data txt reading #####");
-
-  for (q=0; q<10; q=q+1) begin
-    #0.5 clk1 = 1'b0;   
-    #0.5 clk1 = 1'b1;   
-  end
-  reset1 = 0;
-
-  vn_file = $fopen("ndata.txt", "r");
-
-  //// To get rid of first 4 data in data file ////
-//  vn_scan_file = $fscanf(vn_file, "%s\n", captured_data);
-//  vn_scan_file = $fscanf(vn_file, "%s\n", captured_data);
-//  vn_scan_file = $fscanf(vn_file, "%s\n", captured_data);
-//  vn_scan_file = $fscanf(vn_file, "%s\n", captured_data);
-
-  for (q=0; q<col; q=q+2) begin
-    for (j=0; j<pr; j=j+1) begin
-          vn_scan_file = $fscanf(vn_file, "%d\n", captured_data);
-          data_bin = dec2bin(captured_data);
-	  N_8b[q][j] = captured_data;     //for 4col use
-	  N[q][j] = data_bin[7:4];     //for 8col use
-          N[q+1][j] = data_bin[3:0];   //for 8col use
-//	  $display("##### %d\n", captured_data);
-//          $display("##### %d\n", N[q][j]);
-//	  $display("##### %d\n", N[q+1][j]);
-//	  $display("##### %d\n", N_8b[q][j]);
-    end
-  end
-/////////////////////////////////
-
-
-
-
-
-
-
-
-/////////////// Estimated result printing /////////////////
-
-
-$display("##### Estimated 4bit multiplication result #####");
-
-  for (t=0; t<total_cycle; t=t+1) begin
-     for (q=0; q<col; q=q+1) begin
-       result[t][q] = 0;
-     end
-  end
-
-  for (t=0; t<total_cycle; t=t+1) begin
-     for (q=0; q<col; q=q+1) begin
-         for (k=0; k<pr; k=k+1) begin
-            result[t][q] = result[t][q] + V[t][k] * N[q][k];
-	    //$display("%d",k);
-         end
-
-         temp5b = result[t][q];
-         temp16b = {temp16b[83:0], temp5b};    
-     end
-
-//     $display("%d %d %d %d %d %d %d %d", result[t][0], result[t][1], result[t][2], result[t][3], result[t][4], result[t][5], result[t][6], result[t][7]);
-//     $display("%d %d %d %d %d %d %d %d", temp16b[95:84], temp16b[83:72], temp16b[71:60], temp16b[59:48], temp16b[47:36], temp16b[35:24], temp16b[23:12], temp16b[11:0]);
-//     $display("%h %h %h %h %h %h %h %h", temp16b[95:84], temp16b[83:72], temp16b[71:60], temp16b[59:48], temp16b[47:36], temp16b[35:24], temp16b[23:12], temp16b[11:0]);
-     $display("prd @cycle%2d: %h", t, temp16b);    //%40h
-
-  end
-
-//////////////////////////////////////////////
-
-
-
-
-
-
-///// Vmem writing  /////
-
-$display("##### Vmem writing  #####");
-
-  for (q=0; q<total_cycle; q=q+1) begin
-
-    #0.5 clk1 = 1'b0;  
-    vmem_wr1 = 1;  if (q>0) vnmem_add1 = vnmem_add1 + 1; 
-    
-    mem_in1[2*bw-1:0*bw] = V[q][0];    //7:0
-    mem_in1[4*bw-1:2*bw] = V[q][1];    //15:8
-    mem_in1[6*bw-1:4*bw] = V[q][2];
-    mem_in1[8*bw-1:6*bw] = V[q][3];
-    mem_in1[10*bw-1:8*bw] = V[q][4];
-    mem_in1[12*bw-1:10*bw] = V[q][5];
-    mem_in1[14*bw-1:12*bw] = V[q][6];
-    mem_in1[16*bw-1:14*bw] = V[q][7];  //2*4*8-1:
-/*    mem_in[9*bw-1:8*bw] = Q[q][8];
-    mem_in[10*bw-1:9*bw] = Q[q][9];
-    mem_in[11*bw-1:10*bw] = Q[q][10];
-    mem_in[12*bw-1:11*bw] = Q[q][11];
-    mem_in[13*bw-1:12*bw] = Q[q][12];
-    mem_in[14*bw-1:13*bw] = Q[q][13];
-    mem_in[15*bw-1:14*bw] = Q[q][14];
-    mem_in[16*bw-1:15*bw] = Q[q][15];
-*/
-    #0.5 clk1 = 1'b1;  
-
-  end
-
-
-  #0.5 clk1 = 1'b0;  
-  vmem_wr1 = 0; 
-  vnmem_add1 = 0;
-  #0.5 clk1 = 1'b1;  
-///////////////////////////////////////////
-
-
-
-
-
-///// Nmem writing  /////
-
-$display("##### Nmem writing #####");
-
-  for (q=0; q<col; q=q+1) begin
-
-    #0.5 clk1 = 1'b0;  
-    nmem_wr1 = 1; if (q>0) vnmem_add1 = vnmem_add1 + 1; 
-    
-    mem_in1[2*bw-1:0*bw] = N[q][0];    //7:0
-    mem_in1[4*bw-1:2*bw] = N[q][1];    //15:8
-    mem_in1[6*bw-1:4*bw] = N[q][2];
-    mem_in1[8*bw-1:6*bw] = N[q][3];
-    mem_in1[10*bw-1:8*bw] = N[q][4];
-    mem_in1[12*bw-1:10*bw] = N[q][5];
-    mem_in1[14*bw-1:12*bw] = N[q][6];
-    mem_in1[16*bw-1:14*bw] = N[q][7];  //2*4*8-1:
-/*    mem_in[9*bw-1:8*bw] = K[q][8];
-    mem_in[10*bw-1:9*bw] = K[q][9];
-    mem_in[11*bw-1:10*bw] = K[q][10];
-    mem_in[12*bw-1:11*bw] = K[q][11];
-    mem_in[13*bw-1:12*bw] = K[q][12];
-    mem_in[14*bw-1:13*bw] = K[q][13];
-    mem_in[15*bw-1:14*bw] = K[q][14];
-    mem_in[16*bw-1:15*bw] = K[q][15];
-*/
-    #0.5 clk1 = 1'b1;  
-
-  end
-
-  #0.5 clk1 = 1'b0;  
-  nmem_wr1 = 0;  
-  vnmem_add1 = 0;
-  #0.5 clk1 = 1'b1;  
-///////////////////////////////////////////
-
-
-
-  for (q=0; q<2; q=q+1) begin
-    #0.5 clk1 = 1'b0;  
-    #0.5 clk1 = 1'b1;   
-  end
-
-
-
-
-/////  N data loading  /////
-$display("##### N data loading to processor #####");
-
-  for (q=0; q<col+1; q=q+1) begin
-    #0.5 clk1 = 1'b0;  
-    load1 = 1; 
-    if (q==1) nmem_rd1 = 1;
-    if (q>1) begin
-       vnmem_add1 = vnmem_add1 + 1;
-    end
-
-    #0.5 clk1 = 1'b1;  
-  end
-
-  #0.5 clk1 = 1'b0;  
-  nmem_rd1 = 0; vnmem_add1 = 0;
-  #0.5 clk1 = 1'b1;  
-
-  #0.5 clk1 = 1'b0;  
-  load = 0; 
-  #0.5 clk1 = 1'b1;  
-
-///////////////////////////////////////////
-
- for (q=0; q<10; q=q+1) begin
-    #0.5 clk1 = 1'b0;   
-    #0.5 clk1 = 1'b1;   
- end
-
-
-
-
-
-///// execution  /////
-$display("##### execute #####");
-
-  for (q=0; q<total_cycle; q=q+1) begin
-    #0.5 clk1 = 1'b0;  
-    execute1 = 1; 
-    vmem_rd1 = 1;
-
-    if (q>0) begin
-       vnmem_add1 = vnmem_add1 + 1;
-    end
-
-    #0.5 clk1 = 1'b1;  
-  end
-
-  #0.5 clk1 = 1'b0;  
-  vmem_rd1 = 0; vnmem_add1 = 0; execute1 = 0;
-  #0.5 clk1 = 1'b1;  
-
-
-///////////////////////////////////////////
-
- for (q=0; q<10; q=q+1) begin
-    #0.5 clk1 = 1'b0;   
-    #0.5 clk1 = 1'b1;   
- end
-
-
-
-
-////////////// output fifo rd and wb to psum mem ///////////////////
-
-$display("##### move ofifo to pmem #####");
-
-  for (q=0; q<total_cycle; q=q+1) begin
-    #0.5 clk1 = 1'b0;  
-    ofifo_rd1 = 1; 
-    pmem_wr1 = 1; 
-
-    if (q>0) begin
-       pmem_add1 = pmem_add1 + 1;
-    end
-
-    #0.5 clk1 = 1'b1;  
-  end
-
-  #0.5 clk1 = 1'b0;  
-  pmem_wr1 = 0; pmem_add1 = 0; ofifo_rd1 = 0;
-  #0.5 clk1 = 1'b1;  
-
-///////////////////////////////////////////
-
-/*
-// pmem_out from sram, no recofiguration, norm,  get sum from another core, write to norm sram //
-
-$display("##### move pmem_out from sram, no recon, norm, get sum from another core,write to norm sram  #####");
-
-  pmem_rd1 = 1;
-  #0.5 clk1 = 1'b0;
-  #0.5 clk1 = 1'b1;
-
-  #0.5 clk1 = 1'b0;
-  pmem_add1 = pmem_add1 +1;
-  #0.5 clk1 = 1'b1;
-  #0.5 clk1 = 1'b0;
-  for (q=0; q<total_cycle; q=q+1) begin
-    pmem_add1 = pmem_add1 + 1;	  
-    if (q>4) begin
-       norm_wr1 = 1;
-    end
-    acc1 = 1; div1 = 1;
-    #0.5 clk1 = 1'b1;
-    #0.5 clk1 = 1'b0;
-    if (q>5) begin
-       norm_add1 = norm_add1 + 1;
-    end
-  end     
-  #0.5 clk1 = 1'b1;
-  #0.5 clk1 = 1'b0;
-  pmem_rd1 = 0; pmem_add1 = 0; norm_add1 = norm_add1 + 1;
-  #0.5 clk1 = 1'b1;
-  #0.5 clk1 = 1'b0;
-  acc1 =0; norm_add1 =norm_add1 + 1;
-  #0.5 clk1 = 1'b1;  
-  #0.5 clk1 = 1'b0; 
-  norm_add1 =norm_add1 + 1;
-  #0.5 clk1 = 1'b1; 
-  #0.5 clk1 = 1'b0;
-  norm_add1 =norm_add1 + 1;
-  #0.5 clk1 = 1'b1; 
-  div = 0;
-  #0.5 clk1 = 1'b0;
-  norm_add1 =norm_add1 + 1;
-  #0.5 clk1 = 1'b1; 
-  norm_wr1 = 0; norm_add1 =0;
-
-///////////////////////////////////////////
-
-*/
-  //////////////////// 4bit 8col end////////////////////////////////////
-
-
-
-
-
-
-  //////////////////// 8bit 4col start//////////////////////////////////
-
-/////////////// Estimated result printing /////////////////
-
-
-$display("##### Estimated 8bit multiplication result #####");
-
-
-  for (t=0; t<total_cycle; t=t+1) begin
-     for (q=0; q<col; q=q+1) begin
-       result[t][q] = 0;
-     end
-  end
-
-  for (t=0; t<total_cycle; t=t+1) begin
-     for (q=0; q<col; q=q+2) begin
-         for (k=0; k<pr; k=k+1) begin
-            result[t][q] = result[t][q] + V[t][k] * N_8b[q][k];
-//	    $display("%d",result[t][q]);
-         end
-
-         psum_result = result[t][q];
-         cycle_result = {cycle_result[47:0], psum_result};
-     end
-
-//     $display("%d %d %d %d %d %d %d %d", result[t][0], result[t][1], result[t][2], result[t][3], result[t][4], result[t][5], result[t][6], result[t][7]);
-     $display("prd @cycle%2d: %h", t, cycle_result); 
-
-  end
-
-//////////////////////////////////////////////
-
-
-
-
-// pmem_out from sram, reconfiguration, norm, get sum from another core, write to norm sram//
-
-$display("##### move pmem_out from sram, recon, norm, get sum from another core write to norm sram #####");
-  col_c1 = 1;pmem_rd1 = 1;
-  #0.5 clk1 = 1'b0;
-  #0.5 clk1 = 1'b1;
-  #0.5 clk1 = 1'b0;
-  pmem_add1 = pmem_add1 +1;
-  #0.5 clk1 = 1'b1;
-  #0.5 clk1 = 1'b0;
-  for (q=0; q<total_cycle; q=q+1) begin
-    pmem_add1 = pmem_add1 + 1;	  
-    if (q>4) begin
-       norm_wr1 = 1;
-    end
-    acc1 = 1; div1 = 1;
-    #0.5 clk1 = 1'b1;
-    #0.5 clk1 = 1'b0;
-    if (q>5) begin
-       norm_add1 = norm_add1 + 1;
-    end
-  end     
-  #0.5 clk1 = 1'b1;
-  #0.5 clk1 = 1'b0;
-  pmem_rd1 = 0; pmem_add1 = 0; norm_add1 = norm_add1 + 1;
-  #0.5 clk1 = 1'b1;
-  #0.5 clk1 = 1'b0;
-  acc1 =0; norm_add1 =norm_add1 + 1;
-  #0.5 clk1 = 1'b1;  
-  col_c1 =0;
-  #0.5 clk1 = 1'b0; 
-  norm_add1 =norm_add1 + 1;
-  #0.5 clk1 = 1'b1; 
-  #0.5 clk1 = 1'b0;
-  norm_add1 =norm_add1 + 1;
-  #0.5 clk1 = 1'b1; 
-  div1 = 0;
-  #0.5 clk1 = 1'b0;
-  norm_add1 =norm_add1 + 1;
-  #0.5 clk1 = 1'b1; 
-  norm_wr1 = 0; norm_add1 =0;
-
-
-
-
-  #10 $finish;
-
-
-end
-
-
 
 
 
