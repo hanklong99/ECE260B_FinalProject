@@ -505,7 +505,7 @@ $display("##### N data loading to processor #####");
   #0.5 clk = 1'b0;  clk1 = 1'b1;
   load = 0; 
   #0.5 clk = 1'b1;  clk1 = 1'b0;  
-  load1 = 1; 
+  load1 = 0; 
 
 ///////////////////////////////////////////
 
