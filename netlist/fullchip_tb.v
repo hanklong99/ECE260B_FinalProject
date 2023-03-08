@@ -74,7 +74,29 @@ assign inst[3] = nmem_rd;
 assign inst[2] = nmem_wr;
 assign inst[1] = pmem_rd;
 assign inst[0] = pmem_wr;
+
+reg [bw_psum-1:0] temp5b;
+reg [bw_psum+3:0] temp_sum;
+reg [bw_psum*col-1:0] temp16b;
+
+reg [15:0] psum_result;
+reg [63:0] cycle_result;
+
+
 //core1
+
+integer vn_file1 ; // file handler
+integer vn_scan_file1 ; // file handler
+
+reg [7:0] data_bin1;
+integer  captured_data1;
+
+integer  N_8b1[col -1:0][pr-1:0];
+integer  N1[col-1:0][pr-1:0];
+integer  V1[total_cycle-1:0][pr-1:0];
+integer  result1[total_cycle-1:0][col-1:0];
+integer  sum1[total_cycle-1:0];
+
 reg reset1 = 1;
 reg clk1 =1;
 reg [pr*bw*2-1:0] mem_in1;     
@@ -117,13 +139,14 @@ assign inst1[2] = nmem_wr1;
 assign inst1[1] = pmem_rd1;
 assign inst1[0] = pmem_wr1;
 
+reg [bw_psum-1:0] temp5b1;
+reg [bw_psum+3:0] temp_sum1;
+reg [bw_psum*col-1:0] temp16b1;
 
-reg [bw_psum-1:0] temp5b;
-reg [bw_psum+3:0] temp_sum;
-reg [bw_psum*col-1:0] temp16b;
+reg [15:0] psum_result1;
+reg [63:0] cycle_result1;
 
-reg [15:0] psum_result;
-reg [63:0] cycle_result;
+
 
 
 fullchip #(.bw(bw), .bw_psum(bw_psum), .col(col), .pr(pr)) fullchip_instance (
