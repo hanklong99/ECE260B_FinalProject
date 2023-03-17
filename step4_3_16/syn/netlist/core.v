@@ -15,7 +15,7 @@ output rd_en;
 wire   [bw_psum*col-1:0] pmem_out;
 input  [pr*bw*2-1:0] mem_in;
 input  clk;
-input  [27:0] inst; 
+input [27:0] inst; 
 input  reset;
 input afifo_empty;
 
@@ -23,6 +23,7 @@ wire  [pr*bw*2-1:0] mac_in;
 wire  [pr*bw*2-1:0] nmem_out;
 wire  [pr*bw*2-1:0] vmem_out;
 wire  [bw_psum*col-1:0] pmem_in;
+wire [127:0] pmem_norm_out; 
 wire  [bw_psum*col-1:0] fifo_out;
 wire  [bw_psum*col-1:0] sfp_out;
 wire  [bw_psum*col-1:0] array_out;
@@ -160,7 +161,7 @@ assign pmem_out_16bit = {{4{pmem_out[95]}},pmem_out[95:84],
 
 wire [127:0] pmem_norm_in;     //select by col_c
 assign pmem_norm_in = col_c ? pmem_combined_reg : pmem_out_16bit;
-wire [127:0] pmem_norm_out; 
+
 
 sfp_row #(.bw_psum(bw_psum+4)) sfp_instance (
         .clk(clk),

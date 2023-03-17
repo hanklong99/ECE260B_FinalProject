@@ -16,7 +16,7 @@ module sfp_row (clk, acc, div, sum_out, sum_in, sfp_in, sfp_out, reset, afifo_em
   output [bw_psum+3:0] sum_out;
   output rd_en;
   wire [bw_psum+3:0] sum_this_core;
-  
+  reg [bw_psum+3:0] sum_q;  
   assign sum_out = sum_q;
   
   wire signed [bw_psum-1:0] sfp_in_sign0;
@@ -38,7 +38,7 @@ module sfp_row (clk, acc, div, sum_out, sum_in, sfp_in, sfp_out, reset, afifo_em
   reg signed [bw_psum-1:0] sfp_out_sign6;
   reg signed [bw_psum-1:0] sfp_out_sign7;
 
-  reg [bw_psum+3:0] sum_q;
+ 
   reg fifo_wr;
 
   assign sfp_in_sign0 =  sfp_in[bw_psum*1-1 : bw_psum*0];
