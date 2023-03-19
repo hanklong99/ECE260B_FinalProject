@@ -81,23 +81,23 @@ end
 
 
 assign out =    unsign ? 
-	        {product0_4by4_reg	}
-	+	{product1_4by4_reg	}
-	+	{product2_4by4_reg	}
-	+	{product3_4by4_reg	}
-	+	{product4_4by4_reg	}
-	+	{product5_4by4_reg	}
-	+	{product6_4by4_reg	}
-	+	{product7_4by4_reg	}
+	        (({product0_4by4_reg	}
+	+	{product1_4by4_reg	})
+	+	({product2_4by4_reg	}
+	+	{product3_4by4_reg	}))
+	+	(({product4_4by4_reg	}
+	+	{product5_4by4_reg	})
+	+	({product6_4by4_reg	}
+	+	{product7_4by4_reg	}))
 	:
-	        {{(4){product0_4by4_reg[2*bw-1]}},product0_4by4_reg	}
-	+	{{(4){product1_4by4_reg[2*bw-1]}},product1_4by4_reg	}
-	+	{{(4){product2_4by4_reg[2*bw-1]}},product2_4by4_reg	}
-	+	{{(4){product3_4by4_reg[2*bw-1]}},product3_4by4_reg	}
-	+	{{(4){product4_4by4_reg[2*bw-1]}},product4_4by4_reg	}
-	+	{{(4){product5_4by4_reg[2*bw-1]}},product5_4by4_reg	}
-	+	{{(4){product6_4by4_reg[2*bw-1]}},product6_4by4_reg	}
-	+	{{(4){product7_4by4_reg[2*bw-1]}},product7_4by4_reg	};
+	        (({{(4){product0_4by4_reg[2*bw-1]}},product0_4by4_reg	}
+	+	{{(4){product1_4by4_reg[2*bw-1]}},product1_4by4_reg	})
+	+	({{(4){product2_4by4_reg[2*bw-1]}},product2_4by4_reg	}
+	+	{{(4){product3_4by4_reg[2*bw-1]}},product3_4by4_reg	}))
+	+	(({{(4){product4_4by4_reg[2*bw-1]}},product4_4by4_reg	}
+	+	{{(4){product5_4by4_reg[2*bw-1]}},product5_4by4_reg	})
+	+	({{(4){product6_4by4_reg[2*bw-1]}},product6_4by4_reg	}
+	+	{{(4){product7_4by4_reg[2*bw-1]}},product7_4by4_reg	}));
 /*	+	{{(4){product8[2*bw-1]}},product8	}
 	+	{{(4){product9[2*bw-1]}},product9	}
 	+	{{(4){product10[2*bw-1]}},product10	}

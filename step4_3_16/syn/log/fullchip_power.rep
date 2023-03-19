@@ -8,7 +8,7 @@ Report : power
         -analysis_effort low
 Design : fullchip
 Version: Q-2019.12-SP5-3
-Date   : Thu Mar 16 21:17:38 2023
+Date   : Thu Mar 16 23:11:57 2023
 ****************************************
 
 
@@ -34,12 +34,12 @@ Power-specific unit information :
     Leakage Power Units = 1nW
 
 
-  Cell Internal Power  =  36.0686 mW    (6%)
-  Net Switching Power  = 599.8350 mW   (94%)
+  Cell Internal Power  =  36.0955 mW    (6%)
+  Net Switching Power  = 599.8461 mW   (94%)
                          ---------
-Total Dynamic Power    = 635.9037 mW  (100%)
+Total Dynamic Power    = 635.9415 mW  (100%)
 
-Cell Leakage Power     =   1.3696 mW
+Cell Leakage Power     =   1.3731 mW
 
 
                  Internal         Switching           Leakage            Total
@@ -48,10 +48,10 @@ Power Group      Power            Power               Power              Power  
 io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
 memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
 black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
-clock_network      7.1972          430.5357        2.5365e+05          437.9627  (  93.48%)
-register          28.0004        4.7037e-02        5.6376e+05           28.6112  (   6.11%)
+clock_network      7.2016          430.5388        2.5367e+05          437.9749  (  93.47%)
+register          28.0050        4.7864e-02        5.6364e+05           28.6166  (   6.11%)
 sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
-combinational      0.8711            0.5127        5.5218e+05            1.9360  (   0.41%)
+combinational      0.8888            0.5169        5.5580e+05            1.9615  (   0.42%)
 --------------------------------------------------------------------------------------------------
-Total             36.0686 mW       431.0954 mW     1.3696e+06 nW       468.5098 mW
+Total             36.0954 mW       431.1036 mW     1.3731e+06 nW       468.5530 mW
 1
