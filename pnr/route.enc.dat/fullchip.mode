@@ -1,13 +1,15 @@
 catch { setDesignMode -process 65 }
 catch { setAnalysisMode -analysisType onChipVariation }
-catch { setAnalysisMode -checkType hold }
+catch { setAnalysisMode -checkType setup }
 catch { setAnalysisMode -clkSrcPath true }
 catch { setAnalysisMode -clockPropagation sdcControl }
 catch { setAnalysisMode -cppr both }
 catch { setAnalysisMode -usefulSkew true }
-catch { setOptMode -activeHoldViews { BC_VIEW } }
-catch { setOptMode -activeSetupViews { BC_VIEW WC_VIEW } }
+catch { setOptMode -activeHoldViews { BC_VIEW  } }
+catch { setOptMode -activeSetupViews { WC_VIEW } }
 catch { setOptMode -autoHoldViews { BC_VIEW } }
+catch { setOptMode -autoSetupViews { WC_VIEW} }
+catch { setOptMode -autoTDGRSetupViews { WC_VIEW} }
 catch { setOptMode -autoViewHoldTargetSlack 0 }
 catch { setOptMode -deleteInst true }
 catch { setOptMode -drcMargin 0 }
@@ -21,8 +23,6 @@ catch { setOptMode -preserveAllSequential false }
 catch { setOptMode -restruct true }
 catch { setOptMode -setupTargetSlack 0 }
 catch { setOptMode -verbose true }
-catch { setOptMode -viewOptMustExcludeSetupViewSet WC_VIEW }
-catch { setPathGroupOptions reg2reg -effortLevel high -weight 2 }
 catch { setExtractRCMode  -engine postRoute -total_c_th 0 -relative_c_th 1 -coupling_c_th 0.1 -minNetTermNrToBeInMem 50 }
 catch {setNanoRouteMode -quiet -drouteAllowMergedWireAtPin false}
 catch {setNanoRouteMode -quiet -drouteAntennaFactor 1.000000}
@@ -32,7 +32,7 @@ catch {setNanoRouteMode -quiet -droutePostRouteSpreadWire "auto"}
 catch {setNanoRouteMode -quiet -drouteStartIteration 0}
 catch {setNanoRouteMode -quiet -extractThirdPartyCompatible false}
 catch {setNanoRouteMode -quiet -grouteExpTdStdDelay 14.500000}
-catch {setNanoRouteMode -quiet -grouteExpTdUseTifTimingEngineForImportDesign true}
+catch {setNanoRouteMode -quiet -grouteExpTdUseTifTimingEngineForImportDesign false}
 catch {setNanoRouteMode -quiet -routeSiEffort "medium"}
 catch {setNanoRouteMode -quiet -routeWithSiDriven true}
 catch {setNanoRouteMode -quiet -routeWithSiPostRouteFix false}

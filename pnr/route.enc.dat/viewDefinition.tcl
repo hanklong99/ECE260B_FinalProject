@@ -39,5 +39,5 @@ create_constraint_mode -name CON\
     [list ${::IMEX::dataVar}/mmmc/modes/CON/CON.sdc]
 create_analysis_view -name WC_VIEW -constraint_mode CON -delay_corner WC -latency_file ${::IMEX::dataVar}/mmmc/views/WC_VIEW/latency.sdc
 create_analysis_view -name BC_VIEW -constraint_mode CON -delay_corner BC -latency_file ${::IMEX::dataVar}/mmmc/views/BC_VIEW/latency.sdc
-set_analysis_view -setup [list BC_VIEW WC_VIEW] -hold [list BC_VIEW]
+set_analysis_view -setup [list WC_VIEW] -hold [list BC_VIEW]
 catch {set_interactive_constraint_mode [list CON] } 
