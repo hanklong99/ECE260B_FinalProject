@@ -2,7 +2,7 @@
 // Please do not spread this code without permission 
 module fifo_depth16 (rd_clk, wr_clk, in, out, rd, wr, o_full, o_empty, reset);
 
-  parameter bw = 4;    //bw is equal to bw in ofifo(20) as defined in ofifo
+  parameter bw = 20;    //bw is equal to bw in ofifo(20) as defined in ofifo
   parameter simd = 1;
 
   input  rd_clk;

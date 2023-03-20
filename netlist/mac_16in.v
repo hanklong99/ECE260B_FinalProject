@@ -2,54 +2,48 @@
 // Please do not spread this code without permission 
 module mac_16in (clk, reset, out, a, b);
 
-parameter bw = 8;
-parameter bw_psum = 2*bw+6;
+parameter bw = 4;
+parameter bw_psum = 2*bw+4;
 parameter pr = 8; // parallel factor: number of inputs = 8
 
 output [bw_psum-1:0] out;
 input  clk;
 input  reset;
-input  [pr*bw-1:0] a;
-input  [pr*bw-1:0] b;
+input  [pr*bw*2-1:0] a;
+input  [pr*bw*2-1:0] b;
 
 
-wire		[2*bw-1:0]	product0	;
-wire		[2*bw-1:0]	product1	;
-wire		[2*bw-1:0]	product2	;
-wire		[2*bw-1:0]	product3	;
-wire		[2*bw-1:0]	product4	;
-wire		[2*bw-1:0]	product5	;
-wire		[2*bw-1:0]	product6	;
-wire		[2*bw-1:0]	product7	;
-/*wire		[2*bw-1:0]	product8	;
-wire     	[2*bw-1:0]	product9	;
-wire		[2*bw-1:0]	product10	;
-wire		[2*bw-1:0]	product11	;
-wire		[2*bw-1:0]	product12	;
-wire		[2*bw-1:0]	product13	;
-wire		[2*bw-1:0]	product14	;
-wire		[2*bw-1:0]	product15	;
-*/
-reg		[2*bw-1:0]	product0_reg	;
-reg		[2*bw-1:0]	product1_reg	;
-reg		[2*bw-1:0]	product2_reg	;
-reg		[2*bw-1:0]	product3_reg	;
-reg		[2*bw-1:0]	product4_reg	;
-reg		[2*bw-1:0]	product5_reg	;
-reg		[2*bw-1:0]	product6_reg	;
-reg		[2*bw-1:0]	product7_reg	;
+wire		[2*bw-1:0]	product0_4by4	;
+wire		[2*bw-1:0]	product1_4by4	;
+wire		[2*bw-1:0]	product2_4by4	;
+wire		[2*bw-1:0]	product3_4by4	;
+wire		[2*bw-1:0]	product4_4by4	;
+wire		[2*bw-1:0]	product5_4by4	;
+wire		[2*bw-1:0]	product6_4by4	;
+wire		[2*bw-1:0]	product7_4by4	;
+reg		[2*bw-1:0]	product0_4by4_reg	;
+reg		[2*bw-1:0]	product1_4by4_reg	;
+reg		[2*bw-1:0]	product2_4by4_reg	;
+reg		[2*bw-1:0]	product3_4by4_reg	;
+reg		[2*bw-1:0]	product4_4by4_reg	;
+reg		[2*bw-1:0]	product5_4by4_reg	;
+reg		[2*bw-1:0]	product6_4by4_reg	;
+reg		[2*bw-1:0]	product7_4by4_reg	;
+
+
+//v is a, n is b
 
 genvar i;
 
 
-assign	product0	=	{{(bw){a[bw*	1	-1]}},	a[bw*	1	-1:bw*	0	]}	*	{{(bw){b[bw*	1	-1]}},	b[bw*	1	-1:	bw*	0	]};
-assign	product1	=	{{(bw){a[bw*	2	-1]}},	a[bw*	2	-1:bw*	1	]}	*	{{(bw){b[bw*	2	-1]}},	b[bw*	2	-1:	bw*	1	]};
-assign	product2	=	{{(bw){a[bw*	3	-1]}},	a[bw*	3	-1:bw*	2	]}	*	{{(bw){b[bw*	3	-1]}},	b[bw*	3	-1:	bw*	2	]};
-assign	product3	=	{{(bw){a[bw*	4	-1]}},	a[bw*	4	-1:bw*	3	]}	*	{{(bw){b[bw*	4	-1]}},	b[bw*	4	-1:	bw*	3	]};
-assign	product4	=	{{(bw){a[bw*	5	-1]}},	a[bw*	5	-1:bw*	4	]}	*	{{(bw){b[bw*	5	-1]}},	b[bw*	5	-1:	bw*	4	]};
-assign	product5	=	{{(bw){a[bw*	6	-1]}},	a[bw*	6	-1:bw*	5	]}	*	{{(bw){b[bw*	6	-1]}},	b[bw*	6	-1:	bw*	5	]};
-assign	product6	=	{{(bw){a[bw*	7	-1]}},	a[bw*	7	-1:bw*	6	]}	*	{{(bw){b[bw*	7	-1]}},	b[bw*	7	-1:	bw*	6	]};
-assign	product7	=	{{(bw){a[bw*	8	-1]}},	a[bw*	8	-1:bw*	7	]}	*	{{(bw){b[bw*	8	-1]}},	b[bw*	8	-1:	bw*	7	]};
+assign	product0_4by4	=	{a[bw*	2	-1:bw*	0	]}	*	{b[bw*	2	-1:	bw*	0	]};
+assign	product1_4by4	=	{a[bw*	4	-1:bw*	2	]}	*	{b[bw*	4	-1:	bw*	2	]};
+assign	product2_4by4	=	{a[bw*	6	-1:bw*	4	]}	*	{b[bw*	6	-1:	bw*	4	]};
+assign	product3_4by4	=	{a[bw*	8	-1:bw*	6	]}	*	{b[bw*	8	-1:	bw*	6	]};
+assign	product4_4by4	=	{a[bw*  10	-1:bw*	8	]}	*	{b[bw*	10	-1:	bw*	8	]};
+assign	product5_4by4	=	{a[bw*	12	-1:bw*	10	]}	*	{b[bw*	12	-1:	bw*	10	]};
+assign	product6_4by4	=	{a[bw*	14	-1:bw*	12	]}	*	{b[bw*	14	-1:	bw*	12	]};
+assign	product7_4by4	=	{a[bw*	16	-1:bw*	14	]}	*	{b[bw*	16	-1:	bw*	14	]};
 /*
 assign	product8	=	{{(bw){a[bw*	9	-1]}},	a[bw*	9	-1:bw*	8	]}	*	{{(bw){b[bw*	9	-1]}},	b[bw*	9	-1:	bw*	8	]};
 assign	product9	=	{{(bw){a[bw*	10	-1]}},	a[bw*	10	-1:bw*	9	]}	*	{{(bw){b[bw*	10	-1]}},	b[bw*	10	-1:	bw*	9	]};
@@ -63,37 +57,37 @@ assign	product15	=	{{(bw){a[bw*	16	-1]}},	a[bw*	16	-1:bw*	15	]}	*	{{(bw){b[bw*	1
 
 always@(posedge clk) begin
 	if(reset)begin
-		product0_reg <= 0;
-		product1_reg <= 0;
-		product2_reg <= 0;
-		product3_reg <= 0;
-		product4_reg <= 0;
-		product5_reg <= 0;
-		product6_reg <= 0;
-		product7_reg <= 0;
+		product0_4by4_reg <= 0;
+		product1_4by4_reg <= 0;
+		product2_4by4_reg <= 0;
+		product3_4by4_reg <= 0;
+		product4_4by4_reg <= 0;
+		product5_4by4_reg <= 0;
+		product6_4by4_reg <= 0;
+		product7_4by4_reg <= 0;
         end
 	else begin
-		product0_reg <= product0;
-		product1_reg <= product1;
-		product2_reg <= product2;
-		product3_reg <= product3;
-		product4_reg <= product4;
-		product5_reg <= product5;
-		product6_reg <= product6;
-		product7_reg <= product7;
+		product0_4by4_reg <= product0_4by4;
+		product1_4by4_reg <= product1_4by4;
+		product2_4by4_reg <= product2_4by4;
+		product3_4by4_reg <= product3_4by4;
+		product4_4by4_reg <= product4_4by4;
+		product5_4by4_reg <= product5_4by4;
+		product6_4by4_reg <= product6_4by4;
+		product7_4by4_reg <= product7_4by4;
 	end
 end
 
 
 assign out = 
-                {{(4){product0_reg[2*bw-1]}},product0_reg	}
-	+	{{(4){product1_reg[2*bw-1]}},product1_reg	}
-	+	{{(4){product2_reg[2*bw-1]}},product2_reg	}
-	+	{{(4){product3_reg[2*bw-1]}},product3_reg	}
-	+	{{(4){product4_reg[2*bw-1]}},product4_reg	}
-	+	{{(4){product5_reg[2*bw-1]}},product5_reg	}
-	+	{{(4){product6_reg[2*bw-1]}},product6_reg	}
-	+	{{(4){product7_reg[2*bw-1]}},product7_reg	};
+                {{(4){product0_4by4_reg[2*bw-1]}},product0_4by4_reg	}
+	+	{{(4){product1_4by4_reg[2*bw-1]}},product1_4by4_reg	}
+	+	{{(4){product2_4by4_reg[2*bw-1]}},product2_4by4_reg	}
+	+	{{(4){product3_4by4_reg[2*bw-1]}},product3_4by4_reg	}
+	+	{{(4){product4_4by4_reg[2*bw-1]}},product4_4by4_reg	}
+	+	{{(4){product5_4by4_reg[2*bw-1]}},product5_4by4_reg	}
+	+	{{(4){product6_4by4_reg[2*bw-1]}},product6_4by4_reg	}
+	+	{{(4){product7_4by4_reg[2*bw-1]}},product7_4by4_reg	};
 /*	+	{{(4){product8[2*bw-1]}},product8	}
 	+	{{(4){product9[2*bw-1]}},product9	}
 	+	{{(4){product10[2*bw-1]}},product10	}

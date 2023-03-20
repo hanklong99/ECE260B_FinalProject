@@ -2,14 +2,14 @@
 // Please do not spread this code without permission 
 module mac_col (clk, reset, out, q_in, q_out, i_inst, fifo_wr, o_inst);
 
-parameter bw = 8;
+parameter bw = 4;
 parameter bw_psum = 2*bw+6;
 parameter pr = 8;
 parameter col_id = 0;
 
 output signed [bw_psum-1:0] out;
-input  signed [pr*bw-1:0] q_in;
-output signed [pr*bw-1:0] q_out;
+input  signed [pr*bw*2-1:0] q_in;
+output signed [pr*bw*2-1:0] q_out;
 input  clk, reset;
 input  [1:0] i_inst; // [1]: execute, [0]: load 
 output [1:0] o_inst; // [1]: execute, [0]: load 
@@ -19,8 +19,8 @@ reg    [3:0] cnt_q;
 reg    [1:0] inst_q;
 reg    [1:0] inst_2q;
 reg    [1:0] inst_3q;
-reg   signed [pr*bw-1:0] query_q;
-reg   signed [pr*bw-1:0] key_q;
+reg   signed [pr*bw*2-1:0] query_q;
+reg   signed [pr*bw*2-1:0] key_q;
 wire  signed [bw_psum-1:0] psum;
 
 assign o_inst = inst_q;

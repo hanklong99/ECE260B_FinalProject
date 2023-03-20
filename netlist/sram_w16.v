@@ -2,7 +2,7 @@
 // Please do not spread this code without permission 
 module sram_w16 (CLK, D, Q, CEN, WEN, A);
 
-  parameter sram_bit = 64;   //128
+  parameter sram_bit = 64;   //64 for vdata(8b for each)
   input  CLK;
   input  WEN;
   input  CEN;
