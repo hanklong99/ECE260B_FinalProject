@@ -9,11 +9,11 @@ parameter bw_psum = 2*bw+4;
 parameter pr = 8;  
 
 output reg [bw_psum+3:0] sum_out;
-output [bw_psum*col-1:0] out;
+output [(bw_psum+4)*col-1:0] out;
 wire   [bw_psum*col-1:0] pmem_out;
 input  [pr*bw*2-1:0] mem_in;
 input  clk;
-input  [17:0] inst; 
+input  [26:0] inst; 
 input  reset;
 
 wire  [pr*bw*2-1:0] mac_in;
@@ -23,10 +23,14 @@ wire  [bw_psum*col-1:0] pmem_in;
 wire  [bw_psum*col-1:0] fifo_out;
 wire  [bw_psum*col-1:0] sfp_out;
 wire  [bw_psum*col-1:0] array_out;
+wire  [(bw_psum+4)*col-1:0] norm_in;
+wire  [(bw_psum+4)*col-1:0] norm_out;
+
 wire  [col-1:0] fifo_wr;
 wire  ofifo_rd;
 wire [3:0] vnmem_add;
 wire [3:0] pmem_add;
+wire [3:0] norm_add;
 
 wire  vmem_rd;
 wire  vmem_wr; 
@@ -35,6 +39,12 @@ wire  nmem_wr;
 wire  pmem_rd;
 wire  pmem_wr; 
 
+assign norm_add = inst[26:23] ;
+assign norm_wr = inst[22] ;
+assign norm_rd= inst[21] ;
+assign norm = inst[20];
+assign div = inst[19];
+assign acc = inst[18];
 assign col_c = inst[17];
 assign ofifo_rd = inst[16];
 assign vnmem_add = inst[15:12];
@@ -49,7 +59,7 @@ assign pmem_wr = inst[0];
 
 assign mac_in  = inst[6] ? nmem_out : vmem_out;
 assign pmem_in = fifo_out;
-assign out = col_c ? pmem_combined_reg : pmem_out;
+assign out = pmem_norm_out;
 
 always@(posedge clk) begin
 	if(reset)begin
@@ -110,9 +120,11 @@ sram_160b_w16 #(.sram_bit(col*bw_psum)) psum_mem_instance (
         .A(pmem_add)
 );
 
+
 //wire [95:0] pmem_combined_out;
 reg [63:0] pmem_combined_reg;
 reg col_c_reg = 0;
+
 always@(posedge clk) begin
 	if(reset) begin
 		pmem_combined_reg <= 0;
@@ -128,40 +140,63 @@ always@(posedge clk) begin
 		                            + {{4{pmem_out[59]}},pmem_out[59:48]};
 		pmem_combined_reg[63:48] <= {pmem_out[95:84], 4'b0000} 
 		                            + {{4{pmem_out[83]}},pmem_out[83:72]};
-	        end
+		end
 	end
 end
 
 wire [127:0] pmem_out_16bit;     //make each psum after 4*4 into 16bit, total 8*16 = 128bit
-assign pmem_out_16bit = {{4{pmem_combined_reg[11]}},pmem_combined_reg[11:0],
-	                    {4{pmem_combined_reg[23]}},pmem_combined_reg[23:12],
-			    {4{pmem_combined_reg[35]}},pmem_combined_reg[35:24],
-			    {4{pmem_combined_reg[47]}},pmem_combined_reg[47:36],
-			    {4{pmem_combined_reg[59]}},pmem_combined_reg[59:48],
-	                    {4{pmem_combined_reg[71]}},pmem_combined_reg[71:60],
-			    {4{pmem_combined_reg[83]}},pmem_combined_reg[83:72],
-			    {4{pmem_combined_reg[95]}},pmem_combined_reg[95:84]		    
-			    };
+assign pmem_out_16bit = {{4{pmem_out[95]}},pmem_out[95:84],
+			{4{pmem_out[83]}},pmem_out[83:72],
+			{4{pmem_out[71]}},pmem_out[71:60],
+			{4{pmem_out[59]}},pmem_out[59:48],
+			{4{pmem_out[47]}},pmem_out[47:36],
+			{4{pmem_out[35]}},pmem_out[35:24],
+			{4{pmem_out[23]}},pmem_out[23:12],
+			{4{pmem_out[11]}},pmem_out[11:0]};
 
 wire [127:0] pmem_norm_in;     //select by col_c
 assign pmem_norm_in = col_c ? pmem_combined_reg : pmem_out_16bit;
+wire [127:0] pmem_norm_out; 
 
+sfp_row #(.bw_psum(bw_psum+4)) sfp_instance (
+        .clk(clk),
+        .sfp_in(pmem_norm_in), 
+        .sfp_out(pmem_norm_out), 
+        .div(div),
+        .acc(acc), 
+        .reset(reset)
+);
+assign norm_in = pmem_norm_out;
+sram_160b_w16 #(.sram_bit(col*(bw_psum+4))) psum_norm_mem_instance (
+        .CLK(clk),
+        .D(norm_in),
+        .Q(norm_out),
+        .CEN(!(norm_rd||norm_wr)),
+        .WEN(!norm_wr), 
+        .A(norm_add)
+);
 
-
+/*
   //////////// For printing purpose ////////////
   always @(posedge clk) begin
       if(pmem_wr)
-         $display("4bit result %x %x ", pmem_add, pmem_in); 
+         $display("Memory write to PSUM mem add %x %x ", pmem_add, pmem_in); 
   end
-/*
+
+
   always @(posedge clk) begin
       if(pmem_rd& !col_c)
          $display("PSUM mem out from sram  %x ", pmem_out); 
   end
-*/
+
   always @(posedge clk) begin
       if(pmem_combined_reg)
-         $display("8bit result  %x ", pmem_combined_reg); 
+         $display("PSUM mem combined for 8b  %x ", pmem_combined_reg); 
+  end
+*/
+  always @(posedge clk) begin
+      if(norm_in)
+         $display("NORM result write to sram  %x ", norm_in); 
   end
 
 

@@ -38,9 +38,14 @@ integer i,j,k,t,p,q,s,u, m;
 reg reset = 1;
 reg clk = 0;
 reg [pr*bw*2-1:0] mem_in;     //need to *2 becasue vdata need more than 4bit to extend 0 for pos number
+reg norm_rd = 0;
+reg norm_wr = 0;
+reg norm =0;
+reg div = 0;
+reg acc = 0;
 reg col_c = 0;              //col_c=0 : bw = 4. col = 8, cyc = 8    col_c means 2cols combine into 1col
 reg ofifo_rd = 0;           //col_c=1 : bw = 8, col = 4, cyc = 4
-wire [17:0] inst; 
+wire [26:0] inst; 
 reg vmem_rd = 0;
 reg vmem_wr = 0; 
 reg nmem_rd = 0; 
@@ -51,7 +56,14 @@ reg execute = 0;
 reg load = 0;
 reg [3:0] vnmem_add = 0;
 reg [3:0] pmem_add = 0;
+reg [3:0] norm_add = 0;
 
+assign inst[26:23] = norm_add;
+assign inst[22] = norm_wr;
+assign inst[21] = norm_rd;
+assign inst[20] = norm;
+assign inst[19] = div;
+assign inst[18] = acc;
 assign inst[17] = col_c;
 assign inst[16] = ofifo_rd;
 assign inst[15:12] = vnmem_add;
@@ -65,14 +77,17 @@ assign inst[2] = nmem_wr;
 assign inst[1] = pmem_rd;
 assign inst[0] = pmem_wr;
 
-
-
 reg [bw_psum-1:0] temp5b;
+reg [bw_psum-1:0] temp5b_abs;
+
 reg [bw_psum+3:0] temp_sum;
 reg [bw_psum*col-1:0] temp16b;
+reg [bw_psum*col-1:0] temp16b_abs;
 
-reg [15:0] psum_result;
-reg [63:0] cycle_result;
+reg [bw_psum+3:0] psum_result;
+reg [(bw_psum+4)*4-1:0] cycle_result;
+reg [bw_psum+7:0]	sum_core0_est;
+reg [bw_psum*col-1:0]	out_core0_est;
 
 
 fullchip #(.bw(bw), .bw_psum(bw_psum), .col(col), .pr(pr)) fullchip_instance (
@@ -82,6 +97,29 @@ fullchip #(.bw(bw), .bw_psum(bw_psum), .col(col), .pr(pr)) fullchip_instance (
       .inst(inst)
 );
 
+function [11:0] abs12 ;
+  input [11:0] binary;
+  begin
+    if (binary[11]==1'b1)begin
+      abs12 = -binary;
+    end
+    else begin
+      abs12 = binary;
+    end
+  end
+endfunction
+
+function [15:0] abs16 ;
+  input [15:0] binary;
+  begin
+    if (binary[15]==1'b1)begin
+      abs16 = -binary;
+    end
+    else begin
+      abs16 = binary;
+    end
+  end
+endfunction
 
 function [7:0] dec2bin ;
   input integer  weight ;
@@ -232,7 +270,7 @@ $display("##### N data txt reading #####");
 /////////////// Estimated result printing /////////////////
 
 
-$display("##### Estimated 4bit multiplication result #####");
+$display("##### Estimated 4bit multiplication and norm result #####");
 
   for (t=0; t<total_cycle; t=t+1) begin
      for (q=0; q<col; q=q+1) begin
@@ -248,14 +286,30 @@ $display("##### Estimated 4bit multiplication result #####");
          end
 
          temp5b = result[t][q];
-         temp16b = {temp16b[83:0], temp5b};    
+         temp16b = {temp16b[83:0], temp5b};   
+         temp5b_abs = abs12(result[t][q]);  
+	 temp16b_abs =  {temp16b_abs[83:0], temp5b_abs};
+
+	 sum_core0_est = temp16b_abs[11:0]+temp16b_abs[23:12]+temp16b_abs[35:24]
+	 		+temp16b_abs[47:36]+temp16b_abs[59:48]+temp16b_abs[71:60]
+			+temp16b_abs[83:72]+temp16b_abs[95:84];
+
+         out_core0_est[11:0] = {temp16b_abs[11:0],12'b000000000000}/sum_core0_est;
+	 out_core0_est[23:12] = {temp16b_abs[23:12],12'b000000000000}/sum_core0_est;
+	 out_core0_est[35:24] = {temp16b_abs[35:24],12'b000000000000}/sum_core0_est;
+	 out_core0_est[47:36] = {temp16b_abs[47:36],12'b000000000000}/sum_core0_est;
+	 out_core0_est[59:48] = {temp16b_abs[59:48],12'b000000000000}/sum_core0_est;
+	 out_core0_est[71:60] = {temp16b_abs[71:60],12'b000000000000}/sum_core0_est;
+	 out_core0_est[83:72] = {temp16b_abs[83:72],12'b000000000000}/sum_core0_est;
+	 out_core0_est[95:84] = {temp16b_abs[95:84],12'b000000000000}/sum_core0_est;
+
      end
 
 //     $display("%d %d %d %d %d %d %d %d", result[t][0], result[t][1], result[t][2], result[t][3], result[t][4], result[t][5], result[t][6], result[t][7]);
 //     $display("%d %d %d %d %d %d %d %d", temp16b[95:84], temp16b[83:72], temp16b[71:60], temp16b[59:48], temp16b[47:36], temp16b[35:24], temp16b[23:12], temp16b[11:0]);
 //     $display("%h %h %h %h %h %h %h %h", temp16b[95:84], temp16b[83:72], temp16b[71:60], temp16b[59:48], temp16b[47:36], temp16b[35:24], temp16b[23:12], temp16b[11:0]);
-     $display("prd @cycle%2d: %h", t, temp16b);    //%40h
-
+//     $display("prd @cycle%2d: %h", t, temp16b);    //%40h
+     $display(" estimate  @cycle%2d: %h", t, out_core0_est); 
   end
 
 //////////////////////////////////////////////
@@ -437,29 +491,42 @@ $display("##### move ofifo to pmem #####");
 
 ///////////////////////////////////////////
 
-/*
-////////////// pmem_out from sram ///////////////////
 
-$display("##### move pmem_out from sram #####");
+//////// pmem_out from sram, no recofiguration, norm, write to norm sram ////////
 
-  for (q=0; q<total_cycle+1; q=q+1) begin
-    #0.5 clk = 1'b0;  
-    pmem_rd = 1; 
-
-    if (q>0) begin
-       pmem_add = pmem_add + 1;
+$display("##### move pmem_out from sram, no recon, norm, write to norm sram  #####");
+  pmem_rd = 1;
+  #0.5 clk = 1'b0;
+  #0.5 clk = 1'b1; 
+  #0.5 clk = 1'b0;
+  for (q=0; q<total_cycle; q=q+1) begin
+    pmem_add = pmem_add + 1;
+    if (q>2) begin
+      norm_wr =1;
+    end	  
+    acc = 1;div = 1;
+    #0.5 clk = 1'b1;
+    #0.5 clk = 1'b0;
+    if (q>2) begin
+       norm_add = norm_add + 1;
     end
-
-    #0.5 clk = 1'b1;  
   end
-
-  #0.5 clk = 1'b0;  
-  pmem_rd = 0; pmem_add = 0;
+  #0.5 clk = 1'b1; 
+  #0.5 clk = 1'b0; 
+  pmem_rd = 0; pmem_add = 0;norm_add = norm_add + 1;
+  #0.5 clk = 1'b1; 
+  #0.5 clk = 1'b0; 
+  acc = 0;div = 0;norm_add = norm_add + 1;
   #0.5 clk = 1'b1;  
+  norm_wr = 0;norm_add = 0;
+
+
+///////////////////////////////////////////
+
 
   //////////////////// 4bit 8col end////////////////////////////////////
 
-*/
+
 
 
 
@@ -497,16 +564,53 @@ $display("##### Estimated 8bit multiplication result #####");
 //////////////////////////////////////////////
 
 
+/*
+
+///////// pmem_out from sram, reconfiguration, norm, wite to norm sram/////////
+
+$display("##### move pmem_out from sram, recon, norm, write to norm sram #####");
+  col_c = 1;pmem_rd = 1;
+  #0.5 clk = 1'b0;
+  #0.5 clk = 1'b1;
+//  pmem_rd = 1;col_c = 1;
+  #0.5 clk = 1'b0;
+  pmem_add = pmem_add +1;
+  #0.5 clk = 1'b1;
+  #0.5 clk = 1'b0;
+  for (q=0; q<total_cycle; q=q+1) begin
+    pmem_add = pmem_add + 1;	  
+    if (q>0) begin
+       norm_wr = 1;
+    end
+    acc = 1;div = 1;
+    #0.5 clk = 1'b1;
+    #0.5 clk = 1'b0;
+    if (q>2) begin
+       norm_add = norm_add + 1;
+    end
+  end     
+  #0.5 clk = 1'b1;
+  #0.5 clk = 1'b0;
+  pmem_rd = 0; pmem_add = 0; norm_add = norm_add + 1;
+  #0.5 clk = 1'b1;
+  #0.5 clk = 1'b0;
+  acc =0; div = 0; norm_add =norm_add + 1;
+  #0.5 clk = 1'b1;  
+  norm_wr = 0; norm_add =0;
+  #0.5 clk = 1'b0; 
+  #0.5 clk = 1'b1; 
+  #0.5 clk = 1'b0;
+  #0.5 clk = 1'b1; 
+  col_c =0;
 
 
-////////////// pmem_out from sram and reconfiguration ///////////////////
+////////////// output norm to psum mem ///////////////////
 
-$display("##### 8bit result  #####");
+$display("##### move norm to pmem #####");
 
-  for (q=0; q<total_cycle+1; q=q+1) begin
+  for (q=0; q<total_cycle; q=q+1) begin
     #0.5 clk = 1'b0;  
-    pmem_rd = 1; 
-    col_c = 1;                
+    pmem_wr = 1; 
 
     if (q>0) begin
        pmem_add = pmem_add + 1;
@@ -516,12 +620,11 @@ $display("##### 8bit result  #####");
   end
 
   #0.5 clk = 1'b0;  
-  pmem_rd = 0; pmem_add = 0;;
-  #0.5 clk = 1'b1;  
-  #0.5 clk = 1'b0;  
+  pmem_wr = 0; pmem_add = 0; // ofifo_rd = 0;
   #0.5 clk = 1'b1;  
 
-
+///////////////////////////////////////////
+*/
 
 
   #10 $finish;
