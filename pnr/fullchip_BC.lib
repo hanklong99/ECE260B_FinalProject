@@ -1,6 +1,6 @@
 library (fullchip ){
   delay_model : table_lookup;
-  date : "Sun Mar 19 10:00:45 2023" ;
+  date : "Mon Mar 20 17:02:37 2023" ;
   revision : "1.0" ;
   library_features(report_delay_calculation); 
   bus_naming_style : "%s[%d]" ;
