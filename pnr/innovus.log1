@@ -22465,3 +22465,10 @@ Severity  ID               Count  Summary
 WARNING   IMPCTE-104           1  The constraint mode of this inactive vie...
 *** Message Summary: 1 warning(s), 0 error(s)
 
+**INFO (INTERRUPT): One more Ctrl-C to exit Innovus ...
+Innovus terminated by user interrupt.
+
+*** Memory Usage v#1 (Current mem = 3113.176M, initial mem = 283.785M) ***
+*** Message Summary: 2136 warning(s), 1 error(s)
+
+--- Ending "Innovus" (totcpu=3:39:10, real=4:14:28, mem=3113.2M) ---
